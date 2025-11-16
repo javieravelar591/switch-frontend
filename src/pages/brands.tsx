@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import BrandCard from "@/components/brands";
 import { fetchBrands } from "@/lib/api";
+import BrandGrid from "@/components/brands/BrandGrid";
 
 export default function BrandsPage() {
     const [brands, setBrands] = useState<any[]>([]);
@@ -17,10 +17,8 @@ export default function BrandsPage() {
     if (error) return <p className="text-red-500">Error: {error}</p>;
 
     return (
-      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {brands.map((brand) => (
-          <BrandCard key={brand.id} brand={brand} />
-        ))}
+      <div>
+        <BrandGrid brands={brands} />
       </div> 
     );
 }
