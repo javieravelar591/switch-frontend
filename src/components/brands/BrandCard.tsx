@@ -1,27 +1,46 @@
+import Image from "next/image";
 
 interface BrandCardProps {
-    brand: {
-        id: number;
-        name: string;
-        description: string | null;
-        logo_url: string | null;
-    };
+  name: string;
+  imageUrl?: string;
+  category?: string;
+  tags?: string[];
+  website?: string;
+//   official_site?: string;
 }
 
-export default function BrandCard({ brand }: BrandCardProps) {
-    return (
-        <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center hover:scale-105 transition">
-        {brand.logo_url && (
-            <img
-                src={brand.logo_url}
-                alt={brand.name}
-                className="h-24 w-24 object-contain mb-4"
-            />
-        )}
-        <h2 className="font-semibold text-lg text-black">{brand.name}</h2>
-        <p className="text-sm text-black-600 text-center mt-2 line-clamp-3">
-            {brand.description}
-        </p>
+export default function BrandCard({ name, imageUrl, category, tags, website }: BrandCardProps) {
+  console.log(`https://cdn.brandfetch.io/${name}?c=1id0pRpwlGyD1TTIOUw`);
+  return (
+    <div
+      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer max-w-9/10"
+      onClick={() => website && window.open(website, "_blank")}
+    >
+      {imageUrl ? (
+        <Image
+          src={`https://cdn.brandfetch.io/${name}?c=1id0pRpwlGyD1TTIOUw`}
+          alt={name}
+          width={400}
+          height={400}
+          className="object-cover w-full h-56"
+        />
+      ) : (
+        <div className="bg-gray-100 flex items-center justify-center w-full h-56">
+          <span className="text-gray-400 text-sm">No Image</span>
         </div>
-    );
+      )}
+
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-900 truncate">{name}</h3>
+        {category && (
+          <p className="text-sm text-gray-500 mt-1 capitalize">{category}</p>
+        )}
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span>{tags}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
