@@ -19,7 +19,13 @@ export default function Header() {
 
         <motion.div whileHover={{ scale: 1.05 }}>
           <Link href="/signup" className="px-4 py-2 rounded-xl bg-black text-white hover:opacity-80 dark:bg-white dark:text-black transition">
-            Sign In
+            Sign Up
+          </Link>
+        </motion.div>
+
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Link href="/login" className="px-4 py-2 rounded-xl bg-black text-white hover:opacity-80 dark:bg-white dark:text-black transition">
+            Log In
           </Link>
         </motion.div>
       </nav>
