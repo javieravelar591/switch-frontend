@@ -2,16 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { motion } from "framer-motion";
+
 
 import Carousel from '@/components/carousel'
+import BrandCard from "../brands";
 
 // Optional: define your Brand type if not imported
 type Brand = {
   id: number;
   name: string;
-  logo_url?: string | null;
-  website?: string | null;
+  logo_url?: string;
+  website?: string;
 };
 
 export default function MasonryGrid() {
@@ -68,49 +69,13 @@ export default function MasonryGrid() {
       >
         <div className="columns-2 md:columns-3 gap-4 px-4 w-full max-w-6xl mx-auto">
           {brands.map((brand, i) => (
-            <motion.div
-              key={brand.id}
-              style={{ willChange: "opacity, transform" }}
-              initial={{ opacity: 0.4, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * .001  }}
-              className="break-inside-avoid mb-4 bg-white rounded-xl shadow hover:shadow-lg transition-all cursor-pointer border"
-            >
-              <div
-                key={brand.id}
-                className="break-inside-avoid mb-4 bg-white rounded-xl shadow hover:shadow-lg transition-all cursor-pointer border opacity-100"
-                style={{
-                  animation: `fadeInUp 0.4s ease ${i * 0.03}s both`,
-                }}
-              >
-                <a
-                  href={brand.website ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="w-full aspect-square bg-gray-100 flex items-center justify-center rounded-t-xl overflow-hidden">
-                    {brand.logo_url ? (
-                      <img
-                        src={brand.logo_url}
-                        alt={brand.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-600 text-xl font-semibold">
-                        {brand.name[0]}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="p-4">
-                    <h2 className="font-semibold text-lg truncate">
-                      {brand.name}
-                    </h2>
-                  </div>
-                </a>
-              </div>
-            </motion.div>
+            <BrandCard
+              id={i}
+              name={brand.name}
+              imageUrl={brand.logo_url}
+              // tags={}
+              // website={}
+            />
           ))}
         </div>
         {/* <style jsx>{`
