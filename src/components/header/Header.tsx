@@ -28,6 +28,12 @@ export default function Header() {
             Log In
           </Link>
         </motion.div>
+
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Link href="/favorites" className="font-medium text-red-500">
+            Your Favorites
+          </Link>
+        </motion.div>
       </nav>
     </header>
   );

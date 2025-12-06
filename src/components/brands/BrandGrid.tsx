@@ -20,6 +20,7 @@ export default function BrandGrid({ brands }: BrandGridProps) {
       {brands.map((brand) => (
         <div key={brand.id} className="break-inside-avoid">
           <BrandCard
+            id={brand.id}
             name={brand.name}
             imageUrl={brand.logo_url}
             category={brand.category}
