@@ -1,7 +1,6 @@
 "use client";
 
-import { useAnimate, stagger } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Brand = {
   id: number;
@@ -11,74 +10,70 @@ type Brand = {
 };
 
 export default function Carousel({ brands }: { brands: Brand[] }) {
-  const [scope, animate] = useAnimate();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [displayBrands, setDisplayBrands] = useState<Brand[]>([]);
 
+  // Pick a random set of 24 brands once on first load, never re-shuffle
   useEffect(() => {
-    if (brands.length > 0) {
-      animate(
-        "div", // Target child divs
-        { opacity: 1, y: 0 },
-        {
-          duration: 0.5,
-          delay: stagger(0.05), // Slick stagger
-          ease: "easeOut",
-        }
-      );
+    if (brands.length > 0 && displayBrands.length === 0) {
+      const shuffled = [...brands].sort(() => Math.random() - 0.5).slice(0, 24);
+      setDisplayBrands(shuffled);
     }
-  }, [brands, animate]);
-  
+  }, [brands.length]);
+
+  // Seamless infinite scroll: render items twice, jump back by half scrollWidth when
+  // we reach the halfway point — visually identical position, no flicker
   useEffect(() => {
-    if (!scope.current) return;
+    if (!scrollRef.current || displayBrands.length === 0) return;
 
     let animationFrame: number;
-    const scrollSpeed = 0.5; // adjust this for faster/slower scroll
+    const speed = 0.5;
 
     const scroll = () => {
-      if (!scope.current) return;
+      if (!scrollRef.current) return;
+      scrollRef.current.scrollLeft += speed;
 
-      scope.current.scrollLeft += scrollSpeed;
-
-      // Reset when reaching the end
-      if (
-        scope.current.scrollLeft >=
-        scope.current.scrollWidth - scope.current.clientWidth
-      ) {
-        scope.current.scrollLeft = 0;
+      const halfWidth = scrollRef.current.scrollWidth / 2;
+      if (scrollRef.current.scrollLeft >= halfWidth) {
+        scrollRef.current.scrollLeft -= halfWidth;
       }
 
       animationFrame = requestAnimationFrame(scroll);
     };
 
     animationFrame = requestAnimationFrame(scroll);
-
     return () => cancelAnimationFrame(animationFrame);
-  }, [scope]);
+  }, [displayBrands]);
 
+  // Duplicate for seamless loop
+  const items = [...displayBrands, ...displayBrands];
+
+  if (items.length === 0) return null;
 
   return (
-    <div ref={scope} className="flex space-x-4 overflow-x-auto py-4 no-scrollbar">
-      {brands.slice(0, 10).map((brand) => (
-        <div
-          key={brand.id}
-          className="flex-shrink-0 w-40 h-40 rounded-xl shadow-lg bg-white dark:bg-zinc-900 cursor-pointer opacity-0 translate-y-4 transition-all"
+    <div
+      ref={scrollRef}
+      className="flex gap-4 overflow-x-hidden py-4"
+      style={{ scrollbarWidth: "none" }}
+    >
+      {items.map((brand, i) => (
+        <a
+          key={`${brand.id}-${i}`}
+          href={brand.website ?? "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-shrink-0 w-40 h-40 rounded-xl shadow-lg bg-white cursor-pointer flex items-center justify-center p-4"
         >
-          <a
-            href={brand.website ?? "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center h-full p-2"
-          >
-            {brand.logo_url ? (
-              <img
-                src={brand.logo_url}
-                alt={brand.name}
-                className="w-full h-full object-cover rounded-xl"
-              />
-            ) : (
-              <span className="text-lg font-semibold">{brand.name}</span>
-            )}
-          </a>
-        </div>
+          {brand.logo_url ? (
+            <img
+              src={brand.logo_url}
+              alt={brand.name}
+              className="w-3/4 h-3/4 object-contain"
+            />
+          ) : (
+            <span className="text-lg font-semibold text-gray-700">{brand.name}</span>
+          )}
+        </a>
       ))}
     </div>
   );

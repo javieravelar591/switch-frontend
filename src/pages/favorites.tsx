@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BrandCard from "@/components/brands/BrandCard";
+import Header from "@/components/header";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
 
   const fetchFavorites = async () => {
     try {
@@ -23,27 +24,34 @@ export default function FavoritesPage() {
     fetchFavorites();
   }, []);
 
+  const handleFavoriteChange = (_brandId: number, nowFavorited: boolean) => {
+    if (!nowFavorited) fetchFavorites();
+  };
+
   return (
-    <div className="max-w-5xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Your Favorites</h1>
+    <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col">
+      <Header />
+      <main className="max-w-5xl mx-auto w-full py-10 px-4">
+        <h1 className="text-3xl font-bold mb-6 dark:text-white">Your Favorites</h1>
 
-      {favorites.length === 0 && (
-        <p className="text-gray-600">You haven’t favorited anything yet.</p>
-      )}
+        {favorites.length === 0 && (
+          <p className="text-gray-500">You haven't favorited anything yet.</p>
+        )}
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {favorites.map((b: any) => (
-          <BrandCard
-            key={b.id}
-            id={b.id}
-            name={b.name}
-            // description={b.description}
-            // logo_url={b.logo_url}
-            isFavorited={true}         // <-- Favorites page = always true
-            onFavoriteChange={fetchFavorites}
-          />
-        ))}
-      </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {favorites.map((b: any) => (
+            <BrandCard
+              key={b.id}
+              id={b.id}
+              name={b.name}
+              imageUrl={b.logo_url}
+              isFavorited={true}
+              isLoggedIn={true}
+              onFavoriteChange={handleFavoriteChange}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
