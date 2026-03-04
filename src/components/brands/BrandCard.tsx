@@ -13,33 +13,29 @@ interface BrandCardProps {
   tags?: string[];
   website?: string;
   isFavorited?: boolean;
+  isLoggedIn?: boolean;
   onFavoriteChange?: () => void;
 }
 
-export default function BrandCard({ 
+export default function BrandCard({
   id,
-  name, 
-  imageUrl, 
+  name,
+  imageUrl,
   category,
-  tags, 
-  website, 
-  isFavorited=false, 
+  tags,
+  website,
+  isFavorited=false,
+  isLoggedIn=false,
   onFavoriteChange
 }: BrandCardProps) {
   const [favorited, setFavorited] = useState(isFavorited);
 
   const toggleFavorite = async () => {
-    const token = localStorage.getItem("access_token");
-
     try {
       await axios.post(
-        `http://localhost8000/brands/${id}/favorite`,
+        `${process.env.NEXT_PUBLIC_API_URL}/brands/${id}/favorite`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { withCredentials: true }
       );
 
       setFavorited(!favorited);
@@ -86,19 +82,19 @@ export default function BrandCard({
               </span>
             )}
           </div>
+        </a>
 
-          <div className="p-4">
-            <h2 className="font-semibold text-lg truncate">
-              {name}
-            </h2>
+        <div className="p-4 flex items-center justify-between">
+          <h2 className="font-semibold text-lg truncate">{name}</h2>
+          {isLoggedIn && (
             <button
               onClick={toggleFavorite}
-              className="mt-auto self-end text-red-500 hover:text-red-600"
+              className="text-red-500 hover:text-red-600 transition-colors flex-shrink-0"
             >
               {favorited ? <FaHeart size={20} /> : <FaRegHeart size={20} />}
             </button>
-          </div>
-        </a>
+          )}
+        </div>
       </div>
     </motion.div>
   );

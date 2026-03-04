@@ -1,99 +1,131 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     username: "",
     password: "",
   });
 
-  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setStatus(null);
+    setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/user/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (res.ok) {
-        setStatus("success");
-        setFormData({ email: "", username: "", password: "" });
+        router.push("/login");
       } else {
         const data = await res.json();
-        console.log("Response:", data);
-        setStatus(data.detail || "Error creating user");
+        setError(data.detail || "Error creating user");
       }
     } catch (err) {
-      setStatus("Network error");
+      setError("Network error");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
-      <form
-        className="flex flex-col gap-4 bg-zinc-900 p-8 rounded-2xl shadow-xl w-full max-w-sm"
-        onSubmit={handleSubmit}
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-sm"
       >
-        <h1 className="text-xl font-semibold text-center">Create Account</h1>
+        {/* Brand */}
+        <div className="text-center mb-8">
+          <Link href="/" className="text-3xl font-bold text-white tracking-tight hover:opacity-80 transition">
+            Switch
+          </Link>
+          <p className="text-zinc-400 mt-2 text-sm">Create your account</p>
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 focus:ring-2 focus:ring-white focus:outline-none"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
+        {/* Card */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-zinc-400">Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+              />
+            </div>
 
-        <input
-          type="text"
-          placeholder="Username"
-          className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 focus:ring-2 focus:ring-white focus:outline-none"
-          value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          required
-        />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-zinc-400">Username</label>
+              <input
+                type="text"
+                placeholder="yourname"
+                className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                required
+              />
+            </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 focus:ring-2 focus:ring-white focus:outline-none"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-        />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-zinc-400">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-200 transition disabled:opacity-50"
-        >
-          {loading ? "Creating..." : "Sign Up"}
-        </button>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-red-400 text-center"
+              >
+                {error}
+              </motion.p>
+            )}
 
-        {status && (
-          <p
-            className={`text-sm text-center ${
-              status === "success" ? "text-green-400" : "text-red-400"
-            }`}
-          >
-            {status === "success"
-              ? "User created successfully!"
-              : status}
-          </p>
-        )}
-      </form>
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="mt-2 py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Creating account..." : "Sign Up"}
+            </motion.button>
+          </form>
+        </div>
+
+        {/* Footer link */}
+        <p className="text-center text-zinc-500 text-sm mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-white hover:underline">
+            Log in
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 }

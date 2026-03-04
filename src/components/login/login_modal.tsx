@@ -1,4 +1,9 @@
+"use client";
+
 import React, { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+
 export const LoginModal = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,10 +16,11 @@ export const LoginModal = () => {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/user/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -22,11 +28,7 @@ export const LoginModal = () => {
         throw new Error(message.detail || "Login failed");
       }
 
-      const data = await res.json();
-      localStorage.setItem("access_token", data.access_token);
       window.location.href = "/";
-
-      alert("Login successful!");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -35,81 +37,80 @@ export const LoginModal = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <form style={styles.form} onSubmit={handleSubmit}>
-        <h2 style={styles.title}>Login</h2>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-sm"
+      >
+        {/* Brand */}
+        <div className="text-center mb-8">
+          <Link href="/" className="text-3xl font-bold text-white tracking-tight hover:opacity-80 transition">
+            Switch
+          </Link>
+          <p className="text-zinc-400 mt-2 text-sm">Welcome back</p>
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-          required
-        />
+        {/* Card */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-zinc-400">Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
+                required
+              />
+            </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-          required
-        />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-zinc-400">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
+                required
+              />
+            </div>
 
-        {error && <p style={styles.error}>{error}</p>}
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-red-400 text-center"
+              >
+                {error}
+              </motion.p>
+            )}
 
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="mt-2 py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Logging in..." : "Log In"}
+            </motion.button>
+          </form>
+        </div>
+
+        {/* Footer link */}
+        <p className="text-center text-zinc-500 text-sm mt-6">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-white hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "#f4f4f4",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    padding: "2rem",
-    background: "white",
-    borderRadius: "8px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-    width: "350px",
-  },
-  title: {
-    marginBottom: "1rem",
-    textAlign: "center",
-  },
-  input: {
-    padding: "0.75rem",
-    marginBottom: "1rem",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    fontSize: "1rem",
-  },
-  button: {
-    padding: "0.75rem",
-    background: "black",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    fontSize: "1rem",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: "0.9rem",
-    marginBottom: "1rem",
-    textAlign: "center",
-  },
 };
 
 export default LoginModal;

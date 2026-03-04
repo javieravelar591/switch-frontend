@@ -8,16 +8,12 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState([]);
 
   const fetchFavorites = async () => {
-    const token = localStorage.getItem("access_token");
     try {
       const res = await axios.get(
-        `http://localhost8000/user/favorites/`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        `${process.env.NEXT_PUBLIC_API_URL}/user/favorites/`,
+        { withCredentials: true }
       );
       setFavorites(res.data);
-      console.log(res)
     } catch (err) {
       console.error("Failed to fetch favorites", err);
     }

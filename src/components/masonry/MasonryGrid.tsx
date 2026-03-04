@@ -20,6 +20,13 @@ export default function MasonryGrid() {
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
+      .then((res) => setIsLoggedIn(res.ok))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   const LIMIT = 10;
 
@@ -29,7 +36,7 @@ export default function MasonryGrid() {
 
     try {
       const res = await fetch(
-        `http://localhost:8000/brands?skip=${skip}&limit=${LIMIT}`
+        `${process.env.NEXT_PUBLIC_API_URL}/brands?skip=${skip}&limit=${LIMIT}`
       );
       if (!res.ok) throw new Error("Failed to fetch brands");
 
@@ -47,7 +54,7 @@ export default function MasonryGrid() {
   };
 
   useEffect(() => {
-    fetchBrands(); // Initial fetch
+    fetchBrands();
   }, []);
 
   return (
@@ -70,26 +77,14 @@ export default function MasonryGrid() {
         <div className="columns-2 md:columns-3 gap-4 px-4 w-full max-w-6xl mx-auto">
           {brands.map((brand, i) => (
             <BrandCard
-              id={i}
+              key={brand.id}
+              id={brand.id}
               name={brand.name}
               imageUrl={brand.logo_url}
-              // tags={}
-              // website={}
+              isLoggedIn={isLoggedIn}
             />
           ))}
         </div>
-        {/* <style jsx>{`
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}</style> */}
       </InfiniteScroll>
     </>
   );
