@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import Carousel from '@/components/carousel'
@@ -14,12 +15,31 @@ type Brand = {
   website?: string;
   category?: string;
   description?: string;
+  popular?: boolean;
 };
 
 const CATEGORIES = [
   { label: "All", value: "" },
   { label: "Streetwear", value: "streetwear" },
   { label: "Luxury", value: "luxury" },
+];
+
+const REGIONS = [
+  { label: "All Regions", value: "" },
+  { label: "North America", value: "north-america" },
+  { label: "Europe", value: "europe" },
+  { label: "East Asia", value: "east-asia" },
+  { label: "Latin America", value: "latin-america" },
+  { label: "Africa", value: "africa" },
+  { label: "South Asia", value: "south-asia" },
+  { label: "Southeast Asia", value: "southeast-asia" },
+];
+
+const SORT_OPTIONS = [
+  { label: "Default", value: "" },
+  { label: "A–Z", value: "name" },
+  { label: "Most Favorited", value: "popular" },
+  { label: "Newest", value: "newest" },
 ];
 
 const LIMIT = 12;
@@ -37,6 +57,9 @@ function SkeletonCard() {
 }
 
 export default function MasonryGrid() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get("search") || "";
+
   const [brands, setBrands] = useState<Brand[]>([]);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -45,7 +68,10 @@ export default function MasonryGrid() {
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set());
   const [recommendedBrands, setRecommendedBrands] = useState<Brand[]>([]);
   const [activeCategory, setActiveCategory] = useState("");
+  const [activeRegion, setActiveRegion] = useState("");
+  const [activeSort, setActiveSort] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
+  const isLoadingRef = useRef(false);
 
   const fetchRecommendations = async () => {
     try {
@@ -90,42 +116,76 @@ export default function MasonryGrid() {
       .catch(() => {});
   }, []);
 
-  const fetchBrands = useCallback(async (currentSkip: number, category: string) => {
-    if (isLoading) return;
+  const fetchBrands = async (
+    currentSkip: number,
+    category: string,
+    region: string,
+    search: string,
+    sort: string
+  ) => {
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
     setIsLoading(true);
     try {
-      const categoryParam = category ? `&category=${category}` : "";
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/brands?skip=${currentSkip}&limit=${LIMIT}${categoryParam}`
-      );
+      const params = new URLSearchParams({ skip: String(currentSkip), limit: String(LIMIT) });
+      if (category) params.set("category", category);
+      if (region) params.set("region", region);
+      if (search) params.set("search", search);
+      if (sort) params.set("sort", sort);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands?${params}`);
       if (!res.ok) throw new Error("Failed to fetch brands");
       const data: Brand[] = await res.json();
       setBrands((prev) => currentSkip === 0 ? data : [...prev, ...data]);
       setSkip(currentSkip + LIMIT);
-      if (data.length < LIMIT) setHasMore(false);
-      else setHasMore(true);
+      setHasMore(data.length === LIMIT);
     } catch (error) {
       console.error("Error fetching brands:", error);
       setHasMore(false);
     } finally {
+      isLoadingRef.current = false;
       setIsLoading(false);
       setInitialLoading(false);
     }
-  }, [isLoading]);
+  };
 
   // Initial load
   useEffect(() => {
-    fetchBrands(0, activeCategory);
+    fetchBrands(0, activeCategory, activeRegion, searchQuery, activeSort);
   }, []);
 
-  // Reset when category changes
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
+  // Re-fetch when search query changes
+  useEffect(() => {
     setBrands([]);
     setSkip(0);
     setHasMore(true);
     setInitialLoading(true);
-    fetchBrands(0, category);
+    isLoadingRef.current = false;
+    fetchBrands(0, activeCategory, activeRegion, searchQuery, activeSort);
+  }, [searchQuery]);
+
+  const resetAndFetch = (category: string, region: string, sort: string) => {
+    setBrands([]);
+    setSkip(0);
+    setHasMore(true);
+    setInitialLoading(true);
+    isLoadingRef.current = false;
+    fetchBrands(0, category, region, searchQuery, sort);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+    resetAndFetch(category, activeRegion, activeSort);
+  };
+
+  const handleRegionChange = (region: string) => {
+    setActiveRegion(region);
+    resetAndFetch(activeCategory, region, activeSort);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setActiveSort(sort);
+    resetAndFetch(activeCategory, activeRegion, sort);
   };
 
   const handleFavoriteToggle = (brandId: number, nowFavorited: boolean) => {
@@ -138,6 +198,15 @@ export default function MasonryGrid() {
     fetchRecommendations();
   };
 
+  const sectionLabel = searchQuery
+    ? `Results for "${searchQuery}"`
+    : activeCategory || activeRegion
+      ? [
+          CATEGORIES.find((c) => c.value === activeCategory)?.label,
+          REGIONS.find((r) => r.value === activeRegion && r.value !== "")?.label,
+        ].filter(Boolean).join(" · ") || "All Brands"
+      : "All Brands";
+
   return (
     <div className="flex flex-col gap-6">
       {/* Carousel */}
@@ -148,31 +217,59 @@ export default function MasonryGrid() {
       {/* Recommended carousel (logged in only) */}
       {isLoggedIn && <RecommendedCarousel brands={recommendedBrands} />}
 
-      {/* Section header + category filters */}
+      {/* Section header + filters */}
       <div className="px-4 flex flex-col gap-4">
-        <div className="flex items-end justify-between">
+        <div className="flex items-end justify-between flex-wrap gap-3">
           <h2 className="text-white text-xl font-semibold tracking-tight">
-            {activeCategory
-              ? CATEGORIES.find((c) => c.value === activeCategory)?.label
-              : "All Brands"}
+            {sectionLabel}
           </h2>
+
+          {/* Sort dropdown */}
+          <select
+            value={activeSort}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="bg-zinc-900 text-zinc-400 text-xs border border-zinc-800 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500/60 cursor-pointer hover:text-white transition-colors"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.value ? `Sort: ${opt.label}` : "Sort: Default"}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => handleCategoryChange(cat.value)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                activeCategory === cat.value
-                  ? "bg-white text-black"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  activeCategory === cat.value
+                    ? "bg-indigo-600 text-white"
+                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {REGIONS.map((r) => (
+              <button
+                key={r.value}
+                onClick={() => handleRegionChange(r.value)}
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  activeRegion === r.value
+                    ? "bg-zinc-600 text-white"
+                    : "bg-zinc-900 text-zinc-500 border border-zinc-800 hover:border-zinc-600 hover:text-zinc-300"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -184,7 +281,7 @@ export default function MasonryGrid() {
       ) : (
         <InfiniteScroll
           dataLength={brands.length}
-          next={() => fetchBrands(skip, activeCategory)}
+          next={() => fetchBrands(skip, activeCategory, activeRegion, searchQuery, activeSort)}
           hasMore={hasMore}
           loader={
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 mt-4">
@@ -193,7 +290,9 @@ export default function MasonryGrid() {
           }
           endMessage={
             <p className="text-center mt-8 mb-4 text-zinc-600 text-sm">
-              You've seen all {brands.length} brands.
+              {brands.length > 0
+                ? `You've seen all ${brands.length} brands.`
+                : "No brands found."}
             </p>
           }
           scrollThreshold={0.8}
@@ -209,6 +308,7 @@ export default function MasonryGrid() {
                 description={brand.description}
                 isLoggedIn={isLoggedIn}
                 isFavorited={favoritedIds.has(brand.id)}
+                popular={brand.popular}
                 onFavoriteChange={handleFavoriteToggle}
               />
             ))}

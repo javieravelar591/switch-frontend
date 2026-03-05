@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+#rules
+/.claude
+
 # next.js
 /.next/
 /out/
