@@ -165,7 +165,6 @@ export default function BrandPage() {
       .then((data: Brand | null) => {
         if (data) {
           setBrand(data);
-          // Fetch similar brands once we know the category
           if (data.category) {
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands?category=${data.category}&limit=10&sort=popular`)
               .then((res) => res.ok ? res.json() : [])
@@ -227,8 +226,16 @@ export default function BrandPage() {
   return (
     <>
       <Head>
-        <title>{brand.name} — Switch</title>
-        <meta name="description" content={brand.description || `Discover ${brand.name} on Switch.`} />
+        <title>{brand.name} | Switch</title>
+        <meta name="description" content={brand.description || `Discover ${brand.name} on Switch — the brand discovery platform for streetwear, luxury, and culture.`} />
+        <meta property="og:title" content={`${brand.name} | Switch`} />
+        <meta property="og:description" content={brand.description || `Explore ${brand.name} on Switch.`} />
+        <meta property="og:type" content="website" />
+        {brand.logo_url && <meta property="og:image" content={brand.logo_url} />}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${brand.name} | Switch`} />
+        <meta name="twitter:description" content={brand.description || `Explore ${brand.name} on Switch.`} />
+        {brand.logo_url && <meta name="twitter:image" content={brand.logo_url} />}
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0a]">
@@ -427,3 +434,4 @@ export default function BrandPage() {
     </>
   );
 }
+

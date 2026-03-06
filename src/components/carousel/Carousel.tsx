@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { InfiniteSlider } from "@/components/ui/infinite-slider";
 
 type Brand = {
   id: number;
@@ -10,10 +11,8 @@ type Brand = {
 };
 
 export default function Carousel({ brands }: { brands: Brand[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [displayBrands, setDisplayBrands] = useState<Brand[]>([]);
 
-  // Pick a random set of 24 brands once on first load, never re-shuffle
   useEffect(() => {
     if (brands.length > 0 && displayBrands.length === 0) {
       const shuffled = [...brands].sort(() => Math.random() - 0.5).slice(0, 24);
@@ -21,44 +20,13 @@ export default function Carousel({ brands }: { brands: Brand[] }) {
     }
   }, [brands.length]);
 
-  // Seamless infinite scroll: render items twice, jump back by half scrollWidth when
-  // we reach the halfway point — visually identical position, no flicker
-  useEffect(() => {
-    if (!scrollRef.current || displayBrands.length === 0) return;
-
-    let animationFrame: number;
-    const speed = 0.5;
-
-    const scroll = () => {
-      if (!scrollRef.current) return;
-      scrollRef.current.scrollLeft += speed;
-
-      const halfWidth = scrollRef.current.scrollWidth / 2;
-      if (scrollRef.current.scrollLeft >= halfWidth) {
-        scrollRef.current.scrollLeft -= halfWidth;
-      }
-
-      animationFrame = requestAnimationFrame(scroll);
-    };
-
-    animationFrame = requestAnimationFrame(scroll);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [displayBrands]);
-
-  // Duplicate for seamless loop
-  const items = [...displayBrands, ...displayBrands];
-
-  if (items.length === 0) return null;
+  if (displayBrands.length === 0) return null;
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex gap-4 overflow-x-hidden py-4"
-      style={{ scrollbarWidth: "none" }}
-    >
-      {items.map((brand, i) => (
+    <InfiniteSlider gap={16} duration={40}>
+      {displayBrands.map((brand) => (
         <a
-          key={`${brand.id}-${i}`}
+          key={brand.id}
           href={brand.website ?? "#"}
           target="_blank"
           rel="noopener noreferrer"
@@ -75,6 +43,6 @@ export default function Carousel({ brands }: { brands: Brand[] }) {
           )}
         </a>
       ))}
-    </div>
+    </InfiniteSlider>
   );
 }

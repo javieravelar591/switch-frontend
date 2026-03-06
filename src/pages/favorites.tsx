@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import axios from "axios";
 import BrandCard from "@/components/brands/BrandCard";
 import Header from "@/components/header";
@@ -30,6 +31,11 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col">
+      <Head>
+        <title>Your Favorites | Switch</title>
+        <meta name="description" content="Your saved brands on Switch." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
       <Header />
       <main className="max-w-5xl mx-auto w-full py-10 px-4">
         <h1 className="text-3xl font-bold mb-6 dark:text-white">Your Favorites</h1>

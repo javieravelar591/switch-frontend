@@ -61,20 +61,12 @@ export default function MasonryGrid() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set());
-  const [carouselBrands, setCarouselBrands] = useState<Brand[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Brand[]>([]);
   const [activeCategory, setActiveCategory] = useState("");
   const [activeRegion, setActiveRegion] = useState("");
   const [activeSort, setActiveSort] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
   const isLoadingRef = useRef(false);
-
-  const fetchCarouselBrands = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands?limit=50`);
-      if (res.ok) setCarouselBrands(await res.json());
-    } catch { /* non-critical */ }
-  };
 
   const fetchRecommendations = async () => {
     try {
@@ -108,7 +100,6 @@ export default function MasonryGrid() {
   };
 
   useEffect(() => {
-    fetchCarouselBrands();
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
       .then((res) => {
         if (res.ok) {
@@ -205,7 +196,7 @@ export default function MasonryGrid() {
     <div className="flex flex-col gap-6">
       {/* Carousel */}
       <div className="w-full">
-        <Carousel brands={carouselBrands} />
+        <Carousel brands={brands} />
       </div>
 
       {/* Recommended carousel (logged in only) */}

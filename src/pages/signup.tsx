@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
@@ -42,6 +43,11 @@ export default function SignupPage() {
   }
 
   return (
+    <>
+    <Head>
+      <title>Sign Up | Switch</title>
+      <meta name="description" content="Join Switch to discover and save your favorite streetwear, luxury, and artisanal brands." />
+    </Head>
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -92,6 +98,7 @@ export default function SignupPage() {
                 className="px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                minLength={8}
                 required
               />
             </div>
@@ -127,5 +134,6 @@ export default function SignupPage() {
         </p>
       </motion.div>
     </div>
+    </>
   );
 }

@@ -13,8 +13,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Switch — Discover the brands that define culture",
-  description: "Explore 300+ streetwear and luxury brands. Favorite the ones you love and get personalized recommendations.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  title: {
+    default: "Switch — Discover the brands that define culture",
+    template: "%s | Switch",
+  },
+  description: "Explore 300+ streetwear, luxury, and artisanal brands. Favorite the ones you love and get personalized recommendations.",
+  openGraph: {
+    title: "Switch — Discover the brands that define culture",
+    description: "Explore 300+ streetwear, luxury, and artisanal brands. Favorite the ones you love and get personalized recommendations.",
+    type: "website",
+    siteName: "Switch",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Switch — Discover the brands that define culture",
+    description: "Explore 300+ streetwear, luxury, and artisanal brands.",
+  },
 };
 
 export default function RootLayout({
