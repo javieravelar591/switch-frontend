@@ -15,6 +15,7 @@ interface BrandCardProps {
   isFavorited?: boolean;
   isLoggedIn?: boolean;
   popular?: boolean;
+  index?: number;
   onFavoriteChange?: (brandId: number, nowFavorited: boolean) => void;
 }
 
@@ -27,6 +28,7 @@ export default function BrandCard({
   isFavorited = false,
   isLoggedIn = false,
   popular = false,
+  index = 0,
   onFavoriteChange,
 }: BrandCardProps) {
   const [favorited, setFavorited] = useState(isFavorited);
@@ -54,9 +56,10 @@ export default function BrandCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.4, delay: (index % 6) * 0.06 }}
       whileHover={{ scale: 1.02 }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}

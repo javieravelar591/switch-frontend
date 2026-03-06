@@ -46,7 +46,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    window.location.href = q ? `/?search=${encodeURIComponent(q)}` : "/";
+    window.location.href = q ? `/search?q=${encodeURIComponent(q)}` : "/";
   };
 
   const userInitial =

@@ -5,6 +5,8 @@ import MasonryGrid from "@/components/masonry/MasonryGrid";
 import Header from "@/components/header";
 import Hero from "@/components/hero/Hero";
 import BrandTicker from "@/components/brands/BrandTicker";
+import EditorialSpotlight from "@/components/editorial/EditorialSpotlight";
+import Footer from "@/components/footer/Footer";
 
 function MasonryGridSkeleton() {
   return (
@@ -36,11 +38,13 @@ export default function Home() {
       <Header />
       <Hero isLoggedIn={isLoggedIn} />
       <BrandTicker />
+      <EditorialSpotlight />
       <main id="brand-grid" className="w-full max-w-6xl mx-auto pt-10 pb-20">
         <Suspense fallback={<MasonryGridSkeleton />}>
           <MasonryGrid />
         </Suspense>
       </main>
+      <Footer />
     </div>
   );
 }

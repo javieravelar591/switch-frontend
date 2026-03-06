@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import Carousel from '@/components/carousel'
@@ -57,21 +56,25 @@ function SkeletonCard() {
 }
 
 export default function MasonryGrid() {
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams?.get("search") || "";
-
   const [brands, setBrands] = useState<Brand[]>([]);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set());
+  const [carouselBrands, setCarouselBrands] = useState<Brand[]>([]);
   const [recommendedBrands, setRecommendedBrands] = useState<Brand[]>([]);
   const [activeCategory, setActiveCategory] = useState("");
   const [activeRegion, setActiveRegion] = useState("");
   const [activeSort, setActiveSort] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
   const isLoadingRef = useRef(false);
+
+  const fetchCarouselBrands = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands?limit=50`);
+      if (res.ok) setCarouselBrands(await res.json());
+    } catch { /* non-critical */ }
+  };
 
   const fetchRecommendations = async () => {
     try {
@@ -105,6 +108,7 @@ export default function MasonryGrid() {
   };
 
   useEffect(() => {
+    fetchCarouselBrands();
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
       .then((res) => {
         if (res.ok) {
@@ -120,17 +124,14 @@ export default function MasonryGrid() {
     currentSkip: number,
     category: string,
     region: string,
-    search: string,
     sort: string
   ) => {
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
-    setIsLoading(true);
     try {
       const params = new URLSearchParams({ skip: String(currentSkip), limit: String(LIMIT) });
       if (category) params.set("category", category);
       if (region) params.set("region", region);
-      if (search) params.set("search", search);
       if (sort) params.set("sort", sort);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands?${params}`);
@@ -144,25 +145,14 @@ export default function MasonryGrid() {
       setHasMore(false);
     } finally {
       isLoadingRef.current = false;
-      setIsLoading(false);
       setInitialLoading(false);
     }
   };
 
   // Initial load
   useEffect(() => {
-    fetchBrands(0, activeCategory, activeRegion, searchQuery, activeSort);
+    fetchBrands(0, activeCategory, activeRegion, activeSort);
   }, []);
-
-  // Re-fetch when search query changes
-  useEffect(() => {
-    setBrands([]);
-    setSkip(0);
-    setHasMore(true);
-    setInitialLoading(true);
-    isLoadingRef.current = false;
-    fetchBrands(0, activeCategory, activeRegion, searchQuery, activeSort);
-  }, [searchQuery]);
 
   const resetAndFetch = (category: string, region: string, sort: string) => {
     setBrands([]);
@@ -170,7 +160,7 @@ export default function MasonryGrid() {
     setHasMore(true);
     setInitialLoading(true);
     isLoadingRef.current = false;
-    fetchBrands(0, category, region, searchQuery, sort);
+    fetchBrands(0, category, region, sort);
   };
 
   const handleCategoryChange = (category: string) => {
@@ -188,6 +178,12 @@ export default function MasonryGrid() {
     resetAndFetch(activeCategory, activeRegion, sort);
   };
 
+  const clearAllFilters = () => {
+    setActiveCategory("");
+    setActiveRegion("");
+    resetAndFetch("", "", activeSort);
+  };
+
   const handleFavoriteToggle = (brandId: number, nowFavorited: boolean) => {
     setFavoritedIds((prev) => {
       const next = new Set(prev);
@@ -198,20 +194,18 @@ export default function MasonryGrid() {
     fetchRecommendations();
   };
 
-  const sectionLabel = searchQuery
-    ? `Results for "${searchQuery}"`
-    : activeCategory || activeRegion
-      ? [
-          CATEGORIES.find((c) => c.value === activeCategory)?.label,
-          REGIONS.find((r) => r.value === activeRegion && r.value !== "")?.label,
-        ].filter(Boolean).join(" · ") || "All Brands"
-      : "All Brands";
+  const sectionLabel = activeCategory || activeRegion
+    ? [
+        CATEGORIES.find((c) => c.value === activeCategory)?.label,
+        REGIONS.find((r) => r.value === activeRegion && r.value !== "")?.label,
+      ].filter(Boolean).join(" · ") || "All Brands"
+    : "All Brands";
 
   return (
     <div className="flex flex-col gap-6">
       {/* Carousel */}
       <div className="w-full">
-        <Carousel brands={brands} />
+        <Carousel brands={carouselBrands} />
       </div>
 
       {/* Recommended carousel (logged in only) */}
@@ -281,7 +275,7 @@ export default function MasonryGrid() {
       ) : (
         <InfiniteScroll
           dataLength={brands.length}
-          next={() => fetchBrands(skip, activeCategory, activeRegion, searchQuery, activeSort)}
+          next={() => fetchBrands(skip, activeCategory, activeRegion, activeSort)}
           hasMore={hasMore}
           loader={
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 mt-4">
@@ -289,16 +283,35 @@ export default function MasonryGrid() {
             </div>
           }
           endMessage={
-            <p className="text-center mt-8 mb-4 text-zinc-600 text-sm">
-              {brands.length > 0
-                ? `You've seen all ${brands.length} brands.`
-                : "No brands found."}
-            </p>
+            brands.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-5">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                  </svg>
+                </div>
+                <p className="text-white text-sm font-medium mb-1">No brands found</p>
+                <p className="text-zinc-600 text-xs max-w-[220px] leading-relaxed mb-5">
+                  Try adjusting your filters or search query.
+                </p>
+                <button
+                  onClick={clearAllFilters}
+                  className="px-4 py-2 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-medium hover:bg-zinc-800 hover:border-zinc-500 transition-colors cursor-pointer"
+                >
+                  Clear filters
+                </button>
+              </div>
+            ) : (
+              <p className="text-center mt-8 mb-4 text-zinc-700 text-xs tracking-widest uppercase">
+                {`— ${brands.length} brands —`}
+              </p>
+            )
           }
           scrollThreshold={0.8}
         >
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4">
-            {brands.map((brand) => (
+            {brands.map((brand, i) => (
               <BrandCard
                 key={brand.id}
                 id={brand.id}
@@ -309,6 +322,7 @@ export default function MasonryGrid() {
                 isLoggedIn={isLoggedIn}
                 isFavorited={favoritedIds.has(brand.id)}
                 popular={brand.popular}
+                index={i}
                 onFavoriteChange={handleFavoriteToggle}
               />
             ))}
