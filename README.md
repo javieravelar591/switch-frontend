@@ -1,6 +1,6 @@
 # Switch
 
-A fashion brand discovery platform. Browse, search, and favorite brands curated by category, region, and popularity — with personalized recommendations based on your taste.
+A fashion brand discovery platform. Browse, search, and favorite brands curated by category, region, and popularity — with personalized recommendations based on your taste. Checkout the live site [here](https://switch.fashion/)
 
 ## Features
 
