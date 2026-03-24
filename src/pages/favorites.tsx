@@ -1,12 +1,10 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import axios from "axios";
 import BrandCard from "@/components/brands/BrandCard";
-import Header from "@/components/header";
+import withAuth from "@/components/hoc/withAuth";
 
-export default function FavoritesPage() {
+function FavoritesPage() {
   const [favorites, setFavorites] = useState<any[]>([]);
 
   const fetchFavorites = async () => {
@@ -36,7 +34,6 @@ export default function FavoritesPage() {
         <meta name="description" content="Your saved brands on Switch." />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <Header />
       <main className="max-w-5xl mx-auto w-full py-10 px-4">
         <h1 className="text-3xl font-bold mb-6 dark:text-white">Your Favorites</h1>
 
@@ -61,3 +58,5 @@ export default function FavoritesPage() {
     </div>
   );
 }
+
+export default withAuth(FavoritesPage);

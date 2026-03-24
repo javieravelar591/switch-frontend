@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { FaHeart, FaRegHeart, FaExternalLinkAlt, FaArrowLeft } from "react-icons/fa";
-import Header from "@/components/header";
 import Footer from "@/components/footer/Footer";
 
 type Brand = {
@@ -46,7 +45,6 @@ function timeAgo(dateStr?: string): string {
 function HeroSkeleton() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Header />
       <div className="w-full bg-zinc-950 border-b border-zinc-800/40 px-6 py-8">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-6 pt-8 pb-16 animate-pulse">
           <div className="w-28 h-28 bg-zinc-800 rounded-2xl" />
@@ -207,8 +205,7 @@ export default function BrandPage() {
   if (!brand) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
-        <Header />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
             <span className="text-zinc-600 text-lg font-light" style={{ fontFamily: "var(--font-editorial)" }}>?</span>
           </div>
@@ -239,8 +236,7 @@ export default function BrandPage() {
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0a]">
-        <Header />
-
+  
         {/* ── Cinematic Hero ─────────────────────────────────── */}
         <div className="relative w-full bg-zinc-950 border-b border-zinc-800/40 overflow-hidden">
           {/* Radial atmospheric glow */}

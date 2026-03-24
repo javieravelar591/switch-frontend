@@ -3,26 +3,14 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { FiSearch, FiHeart, FiLogOut } from "react-icons/fi";
+import { FiSearch, FiHeart, FiLogOut, FiShoppingBag } from "react-icons/fi";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ username?: string; email?: string } | null>(null);
+  const { isLoggedIn, user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
-      .then((res) => {
-        if (res.ok) {
-          setIsLoggedIn(true);
-          return res.json();
-        }
-      })
-      .then((data) => { if (data) setUser(data); })
-      .catch(() => setIsLoggedIn(false));
-  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,14 +22,7 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const handleLogout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setIsLoggedIn(false);
-    window.location.href = "/";
-  };
+  const handleLogout = () => logout();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,8 +102,15 @@ export default function Header() {
                     className="absolute right-0 mt-2 w-44 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden"
                   >
                     <Link
-                      href="/favorites"
+                      href="/chat"
                       className="flex items-center gap-2.5 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <FiShoppingBag size={14} /> Personal Shopper
+                    </Link>
+                    <Link
+                      href="/favorites"
+                      className="flex items-center gap-2.5 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors border-t border-zinc-800"
                       onClick={() => setShowDropdown(false)}
                     >
                       <FiHeart size={14} /> Favorites

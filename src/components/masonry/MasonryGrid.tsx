@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import Carousel from '@/components/carousel'
@@ -56,10 +57,10 @@ function SkeletonCard() {
 }
 
 export default function MasonryGrid() {
+  const { isLoggedIn } = useAuth();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set());
   const [recommendedBrands, setRecommendedBrands] = useState<Brand[]>([]);
   const [activeCategory, setActiveCategory] = useState("");
@@ -85,11 +86,6 @@ export default function MasonryGrid() {
   const fetchFavorites = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/favorites`, { credentials: "include" });
-      if (res.status === 401) {
-        setIsLoggedIn(false);
-        window.location.href = "/login";
-        return;
-      }
       if (res.ok) {
         const data: Brand[] = await res.json();
         setFavoritedIds(new Set(data.map((b) => b.id)));
@@ -100,16 +96,11 @@ export default function MasonryGrid() {
   };
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
-      .then((res) => {
-        if (res.ok) {
-          setIsLoggedIn(true);
-          fetchFavorites();
-          fetchRecommendations();
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (isLoggedIn) {
+      fetchFavorites();
+      fetchRecommendations();
+    }
+  }, [isLoggedIn]);
 
   const fetchBrands = async (
     currentSkip: number,

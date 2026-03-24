@@ -1,12 +1,14 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense } from "react";
 import MasonryGrid from "@/components/masonry/MasonryGrid";
 import Header from "@/components/header";
 import Hero from "@/components/hero/Hero";
 import BrandTicker from "@/components/brands/BrandTicker";
 import EditorialSpotlight from "@/components/editorial/EditorialSpotlight";
 import Footer from "@/components/footer/Footer";
+import ChatFAB from "@/components/ui/ChatFAB";
+import { useAuth } from "@/context/AuthContext";
 
 function MasonryGridSkeleton() {
   return (
@@ -25,13 +27,7 @@ function MasonryGridSkeleton() {
 }
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, { credentials: "include" })
-      .then((res) => { if (res.ok) setIsLoggedIn(true); })
-      .catch(() => {});
-  }, []);
+  const { isLoggedIn } = useAuth();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
@@ -45,6 +41,7 @@ export default function Home() {
         </Suspense>
       </main>
       <Footer />
+      <ChatFAB />
     </div>
   );
 }

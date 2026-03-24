@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import Head from "next/head";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Header from "@/components/header";
 import Footer from "@/components/footer/Footer";
 import BrandCard from "@/components/brands/BrandCard";
 
@@ -99,7 +98,6 @@ export default function SearchPage() {
         <meta name="description" content={query ? `Search results for "${query}" on Switch.` : "Search brands on Switch."} />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <Header />
       <main className="w-full max-w-6xl mx-auto px-4 pt-10 pb-20 flex flex-col gap-8">
         {/* Search context */}
         <div>
