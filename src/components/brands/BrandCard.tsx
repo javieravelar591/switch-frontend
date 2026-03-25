@@ -3,6 +3,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
+import { resolveLogoUrl } from "@/lib/logoUrl";
 
 interface BrandCardProps {
   id: number;
@@ -33,6 +34,7 @@ export default function BrandCard({
 }: BrandCardProps) {
   const [favorited, setFavorited] = useState(isFavorited);
   const [hovered, setHovered] = useState(false);
+  const resolvedImage = resolveLogoUrl(imageUrl);
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -74,9 +76,9 @@ export default function BrandCard({
           transition={{ duration: 0.4 }}
         >
           <div className="absolute inset-0 bg-zinc-950 flex items-center justify-center p-8">
-            {imageUrl ? (
+            {resolvedImage ? (
               <img
-                src={imageUrl}
+                src={resolvedImage}
                 alt={name}
                 className="w-3/4 h-3/4 object-contain"
               />
