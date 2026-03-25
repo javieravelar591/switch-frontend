@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion } from "framer-motion";
+import { resolveLogoUrl } from "@/lib/logoUrl";
 
 type Brand = {
   id: number;
@@ -72,9 +73,9 @@ export default function RecommendedCarousel({ brands }: Props) {
                 }}
               >
                 <div className="w-32 h-32 flex items-center justify-center p-4">
-                  {brand.logo_url ? (
+                  {resolveLogoUrl(brand.logo_url) ? (
                     <img
-                      src={brand.logo_url}
+                      src={resolveLogoUrl(brand.logo_url)}
                       alt={brand.name}
                       className="w-full h-full object-contain"
                     />

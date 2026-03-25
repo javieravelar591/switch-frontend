@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { InfiniteSlider } from "@/components/ui/infinite-slider";
+import { resolveLogoUrl } from "@/lib/logoUrl";
 
 type Brand = {
   id: number;
@@ -32,9 +33,9 @@ export default function Carousel({ brands }: { brands: Brand[] }) {
           rel="noopener noreferrer"
           className="flex-shrink-0 w-40 h-40 rounded-xl shadow-lg bg-white cursor-pointer flex items-center justify-center p-4"
         >
-          {brand.logo_url ? (
+          {resolveLogoUrl(brand.logo_url ?? undefined) ? (
             <img
-              src={brand.logo_url}
+              src={resolveLogoUrl(brand.logo_url ?? undefined)}
               alt={brand.name}
               className="w-3/4 h-3/4 object-contain"
             />

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-type User = { username?: string; email?: string };
+type User = { username?: string; email?: string; style_profile?: string | null };
 
 type AuthContextType = {
   isLoggedIn: boolean;

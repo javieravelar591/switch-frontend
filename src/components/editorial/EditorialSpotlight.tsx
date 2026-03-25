@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { resolveLogoUrl } from "@/lib/logoUrl";
 
 type Brand = {
   id: number;
@@ -62,10 +63,10 @@ export default function EditorialSpotlight() {
             className="relative block h-full min-h-[300px] md:min-h-[380px] rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800/50 group cursor-pointer"
           >
             {/* Atmospheric watermark logo */}
-            {featured.logo_url && (
+            {resolveLogoUrl(featured.logo_url) && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <img
-                  src={featured.logo_url}
+                  src={resolveLogoUrl(featured.logo_url)}
                   alt=""
                   className="w-72 h-72 object-contain opacity-[0.06] blur-[2px] scale-110"
                 />
@@ -140,10 +141,10 @@ export default function EditorialSpotlight() {
                 className="relative block h-full min-h-[120px] rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800/50 group cursor-pointer p-6"
               >
                 {/* Faint logo */}
-                {brand.logo_url && (
+                {resolveLogoUrl(brand.logo_url) && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                     <img
-                      src={brand.logo_url}
+                      src={resolveLogoUrl(brand.logo_url)}
                       alt=""
                       className="w-14 h-14 object-contain opacity-[0.08]"
                     />

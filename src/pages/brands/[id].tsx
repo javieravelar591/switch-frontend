@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { FaHeart, FaRegHeart, FaExternalLinkAlt, FaArrowLeft } from "react-icons/fa";
 import Footer from "@/components/footer/Footer";
+import { resolveLogoUrl } from "@/lib/logoUrl";
 
 type Brand = {
   id: number;
@@ -122,8 +123,8 @@ function SimilarBrandCard({ brand }: { brand: Brand }) {
   return (
     <Link href={`/brands/${brand.id}`} className="flex-shrink-0 w-28 group cursor-pointer">
       <div className="w-28 h-28 bg-zinc-950 border border-zinc-800/60 rounded-xl overflow-hidden flex items-center justify-center p-3 group-hover:border-zinc-700 transition-colors duration-300">
-        {brand.logo_url ? (
-          <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" />
+        {resolveLogoUrl(brand.logo_url) ? (
+          <img src={resolveLogoUrl(brand.logo_url)} alt={brand.name} className="w-full h-full object-contain" />
         ) : (
           <span className="text-2xl font-bold text-zinc-600 group-hover:text-zinc-400 transition-colors">
             {brand.name[0]}
@@ -228,11 +229,11 @@ export default function BrandPage() {
         <meta property="og:title" content={`${brand.name} | Switch`} />
         <meta property="og:description" content={brand.description || `Explore ${brand.name} on Switch.`} />
         <meta property="og:type" content="website" />
-        {brand.logo_url && <meta property="og:image" content={brand.logo_url} />}
+        {resolveLogoUrl(brand.logo_url) && <meta property="og:image" content={resolveLogoUrl(brand.logo_url)} />}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content={`${brand.name} | Switch`} />
         <meta name="twitter:description" content={brand.description || `Explore ${brand.name} on Switch.`} />
-        {brand.logo_url && <meta name="twitter:image" content={brand.logo_url} />}
+        {resolveLogoUrl(brand.logo_url) && <meta name="twitter:image" content={resolveLogoUrl(brand.logo_url)} />}
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0a]">
@@ -243,10 +244,10 @@ export default function BrandPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_80%,rgba(39,39,42,0.7)_0%,transparent_65%)] pointer-events-none" />
 
           {/* Watermark logo */}
-          {brand.logo_url && (
+          {resolveLogoUrl(brand.logo_url) && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <img
-                src={brand.logo_url}
+                src={resolveLogoUrl(brand.logo_url)}
                 alt=""
                 className="w-[420px] h-[420px] object-contain opacity-[0.04] blur-sm"
               />
@@ -299,8 +300,8 @@ export default function BrandPage() {
           >
             {/* Logo */}
             <div className="w-24 h-24 md:w-32 md:h-32 bg-white/95 rounded-2xl flex items-center justify-center p-4 shadow-2xl shadow-black/60 mb-8">
-              {brand.logo_url ? (
-                <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" />
+              {resolveLogoUrl(brand.logo_url) ? (
+                <img src={resolveLogoUrl(brand.logo_url)} alt={brand.name} className="w-full h-full object-contain" />
               ) : (
                 <span className="text-4xl font-bold text-zinc-900">{brand.name[0]}</span>
               )}
