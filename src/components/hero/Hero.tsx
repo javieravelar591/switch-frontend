@@ -12,6 +12,17 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <section className="relative w-full h-screen min-h-[600px] flex flex-col overflow-hidden border-b border-zinc-800/40">
 
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        src="/silhouette_vid.mp4"
+      />
+
+      <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none" />
+
       <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18] z-0" aria-hidden="true">
         <filter id="grain">
           <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
