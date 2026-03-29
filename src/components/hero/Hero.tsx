@@ -12,30 +12,18 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <section className="relative w-full h-screen min-h-[600px] flex flex-col overflow-hidden border-b border-zinc-800/40">
 
-      {/* Film grain */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18] z-0" aria-hidden="true">
         <filter id="grain">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.65"
-            numOctaves="3"
-            stitchTiles="stitch"
-          />
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
         <rect width="100%" height="100%" filter="url(#grain)" />
       </svg>
 
-      {/* Vignette */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)] pointer-events-none z-0" />
-
-      {/* Atmospheric glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(99,102,241,0.06),transparent)] pointer-events-none z-0" />
-
-      {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none z-10" />
 
-      {/* Top label bar */}
       <div className="relative z-20 w-full border-b border-zinc-800/40 px-6 md:px-12 py-4 flex items-center justify-between">
         <motion.span
           initial={{ opacity: 0 }}
@@ -55,10 +43,8 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
         </motion.span>
       </div>
 
-      {/* Main content */}
       <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 text-center">
 
-        {/* Section label */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -72,7 +58,6 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
           <div className="h-px w-10 bg-zinc-700" />
         </motion.div>
 
-        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
@@ -105,7 +90,6 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
           Streetwear · Luxury · Avant-Garde · 300+ Brands
         </motion.p>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,7 +117,6 @@ export default function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <div className="relative z-20 pb-10 flex flex-col items-center gap-2">
         <motion.div
           initial={{ opacity: 0 }}

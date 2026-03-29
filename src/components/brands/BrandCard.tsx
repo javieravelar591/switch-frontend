@@ -66,15 +66,12 @@ export default function BrandCard({
     >
       <Link href={`/brands/${id}`} className="block">
 
-        {/* Card face — portrait ratio, white background */}
         <div className="relative w-full aspect-[3/4] overflow-hidden bg-white">
 
-          {/* Popular accent — thin top border */}
           {popular && (
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-zinc-900 z-10" />
           )}
 
-          {/* Logo / fallback */}
           <div className="absolute inset-0 flex items-center justify-center p-8">
             {resolvedImage ? (
               <motion.img
@@ -95,7 +92,6 @@ export default function BrandCard({
             )}
           </div>
 
-          {/* Hover overlay */}
           <AnimatePresence>
             {hovered && (
               <motion.div
@@ -105,7 +101,6 @@ export default function BrandCard({
                 transition={{ duration: 0.25 }}
                 className="absolute inset-0 bg-zinc-950/85 flex flex-col justify-between p-5"
               >
-                {/* Favorite button */}
                 {isLoggedIn && (
                   <div className="flex justify-end">
                     <motion.button
@@ -122,7 +117,6 @@ export default function BrandCard({
                   </div>
                 )}
 
-                {/* Brand info */}
                 <div className={!isLoggedIn ? "mt-auto" : ""}>
                   {category && (
                     <p className="text-[9px] font-medium tracking-[0.35em] uppercase text-zinc-500 mb-2">
@@ -142,7 +136,6 @@ export default function BrandCard({
           </AnimatePresence>
         </div>
 
-        {/* Below card — minimal label */}
         <div className="pt-2.5 pb-1">
           <p className="text-[11px] font-light tracking-[0.12em] uppercase text-zinc-400 truncate">
             {name}
