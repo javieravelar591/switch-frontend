@@ -27,6 +27,14 @@ export function GooeyText({
     let morph = 0;
     let cooldown = cooldownTime;
 
+    // Populate spans immediately so there's no layout shift on first render
+    if (text1Ref.current && text2Ref.current) {
+      text1Ref.current.textContent = texts[textIndex % texts.length];
+      text2Ref.current.textContent = texts[(textIndex + 1) % texts.length];
+      text1Ref.current.style.opacity = "100%";
+      text2Ref.current.style.opacity = "0%";
+    }
+
     const setMorph = (fraction: number) => {
       if (text1Ref.current && text2Ref.current) {
         text2Ref.current.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;

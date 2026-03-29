@@ -47,7 +47,7 @@ const LIMIT = 12;
 function SkeletonCard() {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden animate-pulse">
-      <div className="aspect-square bg-zinc-800" />
+      <div className="aspect-[3/4] bg-zinc-800" />
       <div className="px-3 py-3 flex flex-col gap-2">
         <div className="h-3 bg-zinc-800 rounded w-3/4" />
         <div className="h-2 bg-zinc-800 rounded w-1/3" />
@@ -251,7 +251,7 @@ export default function MasonryGrid() {
 
       {/* Grid */}
       {initialLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-4">
           {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
@@ -260,7 +260,7 @@ export default function MasonryGrid() {
           next={() => fetchBrands(skip, activeCategory, activeRegion, activeSort)}
           hasMore={hasMore}
           loader={
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-4 mt-4">
               {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           }
@@ -292,7 +292,7 @@ export default function MasonryGrid() {
           }
           scrollThreshold={0.8}
         >
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-4">
             {brands.map((brand, i) => (
               <BrandCard
                 key={brand.id}
