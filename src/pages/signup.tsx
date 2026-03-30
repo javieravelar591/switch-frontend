@@ -30,7 +30,7 @@ export default function SignupPage() {
       });
 
       if (res.ok) {
-        router.push("/login");
+        router.push("/login?redirect=/onboarding");
       } else {
         const data = await res.json();
         setError(data.detail || "Error creating user");

@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
 export const LoginModal = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,9 @@ export const LoginModal = () => {
         throw new Error(message.detail || "Login failed");
       }
 
-      window.location.href = "/";
+      const raw = typeof router.query.redirect === "string" ? router.query.redirect : "/";
+      const redirect = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/";
+      window.location.href = redirect;
     } catch (err: any) {
       setError(err.message);
     } finally {
